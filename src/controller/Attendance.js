@@ -33,10 +33,12 @@ export const addAttendance = async (req, res) => {
 export const pendingAttendance = async (req, res) => {
   try {
     const { date, Class } = req.body;
+    const dateString = date;
+    const attendanceDate = dateString.substring(0, 10);
     const condition = {
       subjects: { $exists: true, $ne: [] },
       _id: {
-        $nin: await Attendance.distinct("student", { date: new Date(date) }),
+        $nin: await Attendance.distinct("student", { date: attendanceDate }),
       },
     };
 
@@ -46,6 +48,7 @@ export const pendingAttendance = async (req, res) => {
     const studentWithPendingAtten = await Student.find(condition).select(
       "name Class subjects"
     );
+    console.log(studentWithPendingAtten);
     return res.status(200).json({ user: studentWithPendingAtten });
   } catch (error) {
     console.log(error);
